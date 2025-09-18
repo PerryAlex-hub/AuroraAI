@@ -106,9 +106,9 @@ body {
 
 .app-container {
   width: 100vw;
-  max-width: 950px;
+  max-width: 1400px;
   margin: 0 auto 48px auto;
-  min-height: 80vh;
+  min-height: 82vh;
   max-height: 80vh;
   display: flex;
   flex-direction: column;

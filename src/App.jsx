@@ -1,11 +1,27 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import ChatInput from "./Components/ChatInput";
 import ChatMessagesComponents from "./Components/ChatMessagesComponents";
+import {Chatbot} from "supersimpledev";
 import "./App.css";
 
 function App() {
-  const [chatMessages, setChatMessages] = useState([]);
+  const [chatMessages, setChatMessages] = useState( []);
+  useEffect(() => {
+  Chatbot.addResponses({
+    "What is AuroraAI?": "AuroraAI is an advanced AI chatbot developed by Lumora.",
+    "Who developed you?": "I was developed by the team at Lumora.",
+    "What can you do?":
+      "I can assist with a variety of tasks including answering questions, providing recommendations, and engaging in conversations.",
+    "How do I use you?":
+      "Simply type your questions or messages into the chat input and I'll respond as best as I can!",
+    "What technologies are you built on?":
+      "I am built using state-of-the-art machine learning and natural language processing technologies.",
+  })
 
+}
+  , [chatMessages]);
+
+  
   return (
     <div className="app-bg">
       <div className="ai-header">
@@ -15,7 +31,7 @@ function App() {
           </span>
         </div>
         <h1 className="ai-title">AuroraAI</h1>
-        <span className="ai-beta-badge">BETA</span>
+        <span className="ai-beta-badge">Prof</span>
       </div>
       <div className="app-container">
         {chatMessages.length === 0 && (
@@ -29,6 +45,7 @@ function App() {
           chatMessages={chatMessages}
           setChatMessages={setChatMessages}
         />
+
       </div>
     </div>
   );

@@ -1,10 +1,24 @@
 import {useState} from "react";
-import {Chatbot} from "supersimpledev";
+// import {Chatbot} from "supersimpledev";
+import ReactMarkdown from "react-markdown";
+import { GoogleGenAI } from "@google/genai";
 import "./ChatInput.css";
 
 function ChatInput({chatMessages, setChatMessages}) {
   const [inputText, setinputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+    const ai = new GoogleGenAI({ apiKey: "AIzaSyD6BsFRsOfY_VMEeVh7OYjl9lJ1j9BsNGU" });
+  
+  // async function main() {
+  //   const response = await ai.models.generateContent({
+  //     model: "gemini-2.5-flash",
+  //     contents: "Explain how AI works in a few words",
+  //   });
+  //   console.log(response.text);
+  // }
+  
+  // main();
 
   function changeInputText(event) {
     setinputText(event.target.value);
@@ -13,6 +27,7 @@ function ChatInput({chatMessages, setChatMessages}) {
   const message = inputText;
 
   async function sendMessage() {
+
     if (isLoading || inputText === "") {
       return;
     }
@@ -46,12 +61,16 @@ function ChatInput({chatMessages, setChatMessages}) {
 
     setinputText("");
 
-    const response = await Chatbot.getResponseAsync(message);
+    // const response = await Chatbot.getResponseAsync(message);
+      const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: inputText,
+    });
 
     setChatMessages([
       ...newChatMessages,
       {
-        message: response,
+        message: <ReactMarkdown>{response.text}</ReactMarkdown>,
         sender: "robot",
         id: crypto.randomUUID(),
       },
@@ -68,6 +87,11 @@ function ChatInput({chatMessages, setChatMessages}) {
     }
   }
 
+  function clearMessages() {
+    setChatMessages([]);
+    localStorage.removeItem('messages');
+  }
+
   return (
     <div className="chat-input-container">
       <input
@@ -82,6 +106,10 @@ function ChatInput({chatMessages, setChatMessages}) {
       <button className="send-button" onClick={sendMessage}>
         {" "}
         Send{" "}
+      </button>
+      <button className="clear-button" onClick={clearMessages}>
+        {" "}
+        Clear{" "}
       </button>
     </div>
   );

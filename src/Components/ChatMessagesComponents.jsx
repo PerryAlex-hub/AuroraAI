@@ -14,12 +14,12 @@ function ChatMessagesComponents({chatMessages}) {
 
   return (
     <div className="chat-messages-container" ref={chatMessagesRef}>
-      {chatMessages.map((chatMessage) => {
+      {chatMessages.map((chatMessage, index) => {
         return (
           <ChatMessage
             message={chatMessage.message}
             sender={chatMessage.sender}
-            key={chatMessage.id}
+            key={chatMessage.id || index}
           />
         );
       })}

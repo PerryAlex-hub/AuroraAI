@@ -1,5 +1,7 @@
+import { useEffect, useRef } from "react";
 import RobotProfileImage from "../assets/robot.png";
 import UserProfileImage from "../assets/user.png";
+import dayjs from "dayjs"
 import "./ChatMessage.css";
 
 function ChatMessage({message, sender}) {
@@ -22,6 +24,20 @@ function ChatMessage({message, sender}) {
 
     }
     */
+
+    // const [date, setDate] = useState(null);
+    const dateRef = useRef(null);
+
+    useEffect(() => {
+      const time = dayjs().valueOf();
+      const current = dayjs(time).format('h:mm a');
+      // setDate(current)
+      const dateElem = dateRef.current;
+      dateElem.innerHTML = current;
+    }, []);
+
+  
+    
   return (
     <div
       className={sender === "user" ? "chat-message-user" : "chat-message-robot"}
@@ -32,8 +48,9 @@ function ChatMessage({message, sender}) {
           src={RobotProfileImage}
           width="50"
         />
+        
       )}
-      <div className="chat-message-text">{message}</div>
+      <div className="chat-message-text">{message} <p ref={dateRef} className="date"></p></div>
       {sender === "user" && (
         <img
           className="chat-message-profile"
