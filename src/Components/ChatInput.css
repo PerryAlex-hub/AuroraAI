@@ -17,6 +17,8 @@
   background: #23272f;
   color: #fff;
   outline: none;
+  overflow-y: auto; 
+  resize: none;
   margin-right: 12px;
   box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.07);
   transition: box-shadow 0.2s;
@@ -60,4 +62,9 @@
 .clear-button:hover {
   background: linear-gradient(135deg, #40e495 0%, #25aae1 100%);
   transform: translateY(-2px) scale(1.04);
+}
+
+.chat-input {
+  scrollbar-width: thin; /* makes it slim */
+  scrollbar-color: #23272f #18191a; /* thumb + track */
 }

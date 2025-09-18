@@ -5,23 +5,41 @@ import {Chatbot} from "supersimpledev";
 import "./App.css";
 
 function App() {
-  const [chatMessages, setChatMessages] = useState( []);
+  // Initialize chatMessages from localStorage or empty array
+  const [chatMessages, setChatMessages] = useState(() => {
+    try {
+      const savedMessages = localStorage.getItem('auroraai-chat-messages');
+      return savedMessages ? JSON.parse(savedMessages) : [];
+    } catch (error) {
+      console.error('Error loading saved chat messages:', error);
+      return [];
+    }
+  });
+
+  // Initialize chatbot responses once
   useEffect(() => {
-  Chatbot.addResponses({
-    "What is AuroraAI?": "AuroraAI is an advanced AI chatbot developed by Lumora.",
-    "Who developed you?": "I was developed by the team at Lumora.",
-    "What can you do?":
-      "I can assist with a variety of tasks including answering questions, providing recommendations, and engaging in conversations.",
-    "How do I use you?":
-      "Simply type your questions or messages into the chat input and I'll respond as best as I can!",
-    "What technologies are you built on?":
-      "I am built using state-of-the-art machine learning and natural language processing technologies.",
-  })
+    Chatbot.addResponses({
+      "What is AuroraAI?": "AuroraAI is an advanced AI chatbot developed by Lumora.",
+      "Who developed you?": "I was developed by the team at Lumora.",
+      "What can you do?":
+        "I can assist with a variety of tasks including answering questions, providing recommendations, and engaging in conversations.",
+      "How do I use you?":
+        "Simply type your questions or messages into the chat input and I'll respond as best as I can!",
+      "What technologies are you built on?":
+        "I am built using state-of-the-art machine learning and natural language processing technologies.",
+    });
+  }, []); // Empty dependency array - only run once
 
-}
-  , [chatMessages]);
+  // Save chat messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('auroraai-chat-messages', JSON.stringify(chatMessages));
+    } catch (error) {
+      console.error('Error saving chat messages:', error);
+    }
+  }, [chatMessages]); // Run whenever chatMessages changes
 
-  
+
   return (
     <div className="app-bg">
       <div className="ai-header">
@@ -45,7 +63,6 @@ function App() {
           chatMessages={chatMessages}
           setChatMessages={setChatMessages}
         />
-
       </div>
     </div>
   );

@@ -1,6 +1,4 @@
 import {useState} from "react";
-// import {Chatbot} from "supersimpledev";
-import ReactMarkdown from "react-markdown";
 import { GoogleGenAI } from "@google/genai";
 import "./ChatInput.css";
 
@@ -8,79 +6,85 @@ function ChatInput({chatMessages, setChatMessages}) {
   const [inputText, setinputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-    const ai = new GoogleGenAI({ apiKey: "AIzaSyD6BsFRsOfY_VMEeVh7OYjl9lJ1j9BsNGU" });
-  
-  // async function main() {
-  //   const response = await ai.models.generateContent({
-  //     model: "gemini-2.5-flash",
-  //     contents: "Explain how AI works in a few words",
-  //   });
-  //   console.log(response.text);
-  // }
-  
-  // main();
+  const ai = new GoogleGenAI({ apiKey: "AIzaSyD6BsFRsOfY_VMEeVh7OYjl9lJ1j9BsNGU" });
 
   function changeInputText(event) {
     setinputText(event.target.value);
   }
 
-  const message = inputText;
-
   async function sendMessage() {
-
-    if (isLoading || inputText === "") {
+    if (isLoading || inputText.trim() === "") {
       return;
     }
 
     setIsLoading(true);
+    const userMessage = inputText.trim();
 
+    // Add user message
     const newChatMessages = [
       ...chatMessages,
       {
-        message: message,
+        text: userMessage, // Changed from 'message' to 'text'
         sender: "user",
         id: crypto.randomUUID(),
       },
     ];
     setChatMessages(newChatMessages);
 
-    setChatMessages([
+    // Add loading message (store as text, not JSX)
+    const messagesWithLoading = [
       ...newChatMessages,
       {
-        message: (
-          <img
-            className="loading-gif"
-            src="https://supersimple.dev/images/loading-spinner.gif"
-            alt="Loading..."
-          />
-        ),
+        text: "...", // Simple loading indicator as text
         sender: "robot",
         id: crypto.randomUUID(),
+        isLoading: true, // Flag to identify loading message
       },
-    ]);
+    ];
+    setChatMessages(messagesWithLoading);
 
     setinputText("");
 
-    // const response = await Chatbot.getResponseAsync(message);
+    try {
+      // Get response from Gemini API
       const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: inputText,
-    });
+        model: "gemini-2.5-flash",
+        contents: userMessage,
+      });
 
-    setChatMessages([
-      ...newChatMessages,
-      {
-        message: <ReactMarkdown>{response.text}</ReactMarkdown>,
-        sender: "robot",
-        id: crypto.randomUUID(),
-      },
-    ]);
+      // Store the raw text response, not JSX
+      const finalMessages = [
+        ...newChatMessages,
+        {
+          text: response.text, // Store raw text
+          sender: "robot",
+          id: crypto.randomUUID(),
+          isMarkdown: true // Flag to indicate this should be rendered as markdown
+        },
+      ];
+      setChatMessages(finalMessages);
+
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Handle error case
+      const errorMessages = [
+        ...newChatMessages,
+        {
+          text: "Sorry, I encountered an error. Please try again.",
+          sender: "robot",
+          id: crypto.randomUUID(),
+          isError: true
+        },
+      ];
+      setChatMessages(errorMessages);
+    }
 
     setIsLoading(false);
   }
 
   function handleKeyDown(event) {
-    if (event.key === "Enter" || event.key === "click") {
+    if (event.key === "Enter") {
       sendMessage();
     } else if (event.key === "Escape") {
       setinputText("");
@@ -89,12 +93,12 @@ function ChatInput({chatMessages, setChatMessages}) {
 
   function clearMessages() {
     setChatMessages([]);
-    localStorage.removeItem('messages');
+    localStorage.removeItem('auroraai-chat-messages'); // Match the key from App.jsx
   }
 
   return (
     <div className="chat-input-container">
-      <input
+      <textarea
         className="chat-input"
         placeholder="Send a message Chatbot"
         onKeyDown={handleKeyDown}
@@ -102,14 +106,17 @@ function ChatInput({chatMessages, setChatMessages}) {
         type="text"
         value={inputText}
         onChange={changeInputText}
+        
       />
-      <button className="send-button" onClick={sendMessage}>
-        {" "}
-        Send{" "}
+      <button 
+        className="send-button" 
+        onClick={sendMessage}
+        disabled={isLoading}
+      >
+        {isLoading ? "Sending..." : "Send"}
       </button>
       <button className="clear-button" onClick={clearMessages}>
-        {" "}
-        Clear{" "}
+        Clear
       </button>
     </div>
   );
